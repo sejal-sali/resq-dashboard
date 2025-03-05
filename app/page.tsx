@@ -9,7 +9,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { auth, db } from "@/lib/firebase";
-import { Eye, EyeOff, Loader2 } from "lucide-react"; // Import icons
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function AdminLoginPage() {
   const [isClient, setIsClient] = useState(false);
@@ -84,7 +84,7 @@ export default function AdminLoginPage() {
   // Show loading state while checking authentication
   if (loadingAuth) {
     return (
-      <div className='flex items-center justify-center min-h-screen bg-slate-900'>
+      <div className='flex items-center justify-center min-h-screen bg-slate-900 px-4'>
         <div className='flex flex-col items-center text-white'>
           <Loader2 className='h-10 w-10 animate-spin mb-2' />
           <p>Checking authentication...</p>
@@ -94,25 +94,27 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className='relative flex items-center justify-center min-h-screen bg-slate-900'>
+    <div className='relative flex items-center justify-center min-h-screen bg-slate-900 px-4 py-6'>
       {isClient && (
         <div className='absolute inset-0 -z-10'>
           <div className='absolute inset-0 bg-slate-900/70'></div>
         </div>
       )}
 
-      <Card className='w-full max-w-[90%] sm:max-w-[380px] shadow-2xl bg-white/95 backdrop-blur-md'>
-        <CardContent className='pt-4'>
+      <Card className='w-full max-w-md shadow-2xl bg-white/95 backdrop-blur-md'>
+        <CardContent className='pt-6 px-4 sm:px-6 md:px-8'>
           <div className='text-center mb-6 mt-2'>
-            <h2 className='text-2xl font-bold text-slate-800'>Admin Login</h2>
-            <p className='text-sm text-slate-500'>
+            <h2 className='text-xl sm:text-2xl font-bold text-slate-800'>
+              Admin Login
+            </h2>
+            <p className='text-xs sm:text-sm text-slate-500 mt-1'>
               Sign in to access admin dashboard
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className='space-y-4'>
+          <form onSubmit={handleLogin} className='space-y-5'>
             <div>
-              <label className='block text-sm font-medium text-slate-700 mb-1'>
+              <label className='block text-sm font-medium text-slate-700 mb-1.5'>
                 Email
               </label>
               <Input
@@ -120,14 +122,14 @@ export default function AdminLoginPage() {
                 placeholder='admin@example.com'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className='h-10'
+                className='h-10 sm:h-11'
                 required
                 disabled={loading}
               />
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-slate-700 mb-1'>
+              <label className='block text-sm font-medium text-slate-700 mb-1.5'>
                 Password
               </label>
               <div className='relative'>
@@ -136,7 +138,7 @@ export default function AdminLoginPage() {
                   placeholder='••••••••'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='h-10 pr-10'
+                  className='h-10 sm:h-11 pr-10'
                   required
                   disabled={loading}
                 />
@@ -145,6 +147,7 @@ export default function AdminLoginPage() {
                   className='absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700'
                   onClick={togglePasswordVisibility}
                   tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className='h-4 w-4' />
@@ -157,7 +160,7 @@ export default function AdminLoginPage() {
 
             <Button
               type='submit'
-              className='w-full h-10 mt-2'
+              className='w-full h-10 sm:h-11 mt-4 text-sm sm:text-base'
               disabled={loading}
             >
               {loading ? (
