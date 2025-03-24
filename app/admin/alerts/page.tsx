@@ -29,6 +29,7 @@ import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import UserProfileModal from "@/components/ui/UserProfileModal";
 
 enum AlertType {
   ChatEmergency = "chat_emergency",
@@ -80,6 +81,11 @@ export default function AlertsPage() {
     {}
   );
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  
+  // Add new state variables for the profile modal
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  
   const router = useRouter();
 
   // Debug log for media-related alerts
@@ -217,6 +223,36 @@ export default function AlertsPage() {
     }
   }
 
+  // Handle user profile clicks
+  function handleUserProfileClick(userId: string) {
+    if (!userId) return;
+    setSelectedUserId(userId);
+    setShowProfileModal(true);
+  }
+  
+  // Function to render clickable user names
+  function getUserNameElement(userId: string, nameOverride?: string) {
+    const displayName = nameOverride || users[userId]?.name || "Unknown User";
+    
+    return (
+      <span 
+        className="cursor-pointer hover:text-blue-600 hover:underline"
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering any parent click handlers
+          handleUserProfileClick(userId);
+        }}
+      >
+        {displayName}
+      </span>
+    );
+  }
+
+  // Get user name as string (for cases where JSX can't be used)
+  function getUserName(userId: string, nameOverride?: string) {
+    if (nameOverride) return nameOverride;
+    return users[userId]?.name || "Unknown User";
+  }
+
   // Handle marking alert as handled
   async function handleMarkAlertHandled(alert: DashboardAlert) {
     try {
@@ -285,12 +321,6 @@ export default function AlertsPage() {
       /https:\/\/maps\.google\.com\/\?q=[\d.-]+,[\d.-]+/
     );
     return match ? match[0] : null;
-  }
-
-  // Get user name
-  function getUserName(userId: string, nameOverride?: string) {
-    if (nameOverride) return nameOverride;
-    return users[userId]?.name || "Unknown User";
   }
 
   // Handle image load error
@@ -661,7 +691,7 @@ export default function AlertsPage() {
                       </a>
                     )}
 
-                    {/* User Info */}
+                    {/* User Info - Updated with clickable names */}
                     <div className='flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-gray-100'>
                       <div className='flex items-center text-sm'>
                         <div className='w-6 h-6 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mr-2'>
@@ -669,7 +699,7 @@ export default function AlertsPage() {
                         </div>
                         <span className='text-gray-500'>From:</span>
                         <span className='ml-1 font-medium'>
-                          {getUserName(alert.senderId, alert.senderName)}
+                          {getUserNameElement(alert.senderId, alert.senderName)}
                         </span>
                       </div>
 
@@ -680,7 +710,7 @@ export default function AlertsPage() {
                           </div>
                           <span className='text-gray-500'>To:</span>
                           <span className='ml-1 font-medium'>
-                            {getUserName(alert.receiverId, alert.receiverName)}
+                            {getUserNameElement(alert.receiverId, alert.receiverName)}
                           </span>
                         </div>
                       )}
@@ -784,6 +814,12 @@ export default function AlertsPage() {
           )}
         </div>
       </div>
+      
+      {/* User Profile Modal */}
+      <UserProfileModal 
+        userId={selectedUserId}
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
-  );
-}
+  );}
