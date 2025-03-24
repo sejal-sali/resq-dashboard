@@ -10,35 +10,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  Bell,
-  History,
-  BarChart3,
-  LogOut,
-  Menu,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Bell, LogOut, Menu, X, Loader2 } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 
 const sidebarLinks = [
-  {
-    name: "Dashboard",
-    href: "/admin",
-    icon: <LayoutDashboard className='h-5 w-5' />,
-  },
   { name: "Alerts", href: "/admin/alerts", icon: <Bell className='h-5 w-5' /> },
-  {
-    name: "Logs & History",
-    href: "/admin/logs",
-    icon: <History className='h-5 w-5' />,
-  },
-  {
-    name: "Analytics",
-    href: "/admin/analytics",
-    icon: <BarChart3 className='h-5 w-5' />,
-  },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
