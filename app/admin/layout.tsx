@@ -1,4 +1,4 @@
-// app/admin/layout.tsx (Dashboard Layout with Sidebar)
+// app/admin/layout.tsx (Simplified Dashboard Layout)
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
@@ -10,11 +10,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Bell, LogOut, Menu, X, Loader2 } from "lucide-react";
+import { Bell, LogOut, Menu, X, Loader2, Shield } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 
 const sidebarLinks = [
-  { name: "Alerts", href: "/admin/alerts", icon: <Bell className='h-5 w-5' /> },
+  {
+    name: "Emergency Alerts",
+    href: "/admin/alerts",
+    icon: <Bell className='h-5 w-5' />,
+    description: "Manage and respond to emergency alerts",
+  },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -23,6 +28,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [adminName, setAdminName] = useState<string>("");
+  const [adminEmail, setAdminEmail] = useState<string>("");
+  const [adminRole, setAdminRole] = useState<string>("Administrator");
+  const [lastLogin, setLastLogin] = useState<string>("");
 
   // Check authentication
   useEffect(() => {
@@ -45,16 +53,32 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             return;
           }
 
-          // Set admin name if available
+          // Get admin data
+          const adminData = adminSnap.data();
+
+          // Set admin information
           setAdminName(
-            adminSnap.data().name || user.email?.split("@")[0] || "Admin"
+            adminData.name ||
+              user.displayName ||
+              user.email?.split("@")[0] ||
+              "Admin"
           );
+          setAdminEmail(user.email || "");
+          setAdminRole(adminData.role || "Administrator");
+
+          // Set last login time if available
+          if (user.metadata.lastSignInTime) {
+            const lastLoginDate = new Date(user.metadata.lastSignInTime);
+            setLastLogin(lastLoginDate.toLocaleString());
+          }
+
           setLoading(false);
         });
 
         return () => unsubscribe();
       } catch (error) {
         console.error("Authentication error:", error);
+        toast.error("Authentication error. Please try again.");
         router.push("/");
       }
     };
@@ -62,14 +86,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     checkAuth();
   }, [router]);
 
-  // Prevent back button
+  // Responsive sidebar handling
   useEffect(() => {
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = () => {
-      window.history.pushState(null, "", window.location.href);
-    };
-
-    // Responsive sidebar handling
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setSidebarOpen(false);
@@ -115,6 +133,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <button
         className='md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md'
         onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label={sidebarOpen ? "Close menu" : "Open menu"}
       >
         {sidebarOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
       </button>
@@ -151,14 +170,36 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Admin Profile */}
-          <div className='px-4 py-3 mb-4 border-b'>
-            <p className='text-sm text-gray-500'>Logged in as</p>
-            <p className='font-medium'>{adminName}</p>
+          <div className='px-4 py-4 mb-4 border-b'>
+            <div className='flex items-center space-x-3'>
+              <div className='p-2 rounded-full bg-primary/10 text-primary'>
+                <Shield className='h-6 w-6' />
+              </div>
+              <div className='flex-1 min-w-0'>
+                <p className='font-medium text-gray-900 truncate'>
+                  {adminName}
+                </p>
+                <p className='text-sm text-gray-500 truncate'>{adminRole}</p>
+              </div>
+            </div>
+            {adminEmail && (
+              <p className='text-xs text-gray-500 mt-2 truncate'>
+                {adminEmail}
+              </p>
+            )}
+            {lastLogin && (
+              <p className='text-xs text-gray-500 mt-1'>
+                Last login: {lastLogin}
+              </p>
+            )}
           </div>
 
           {/* Navigation */}
           <nav className='flex-1 overflow-y-auto px-3'>
-            <ul className='space-y-1.5'>
+            <div className='text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2'>
+              Main
+            </div>
+            <ul className='space-y-1.5 mb-6'>
               {sidebarLinks.map((link) => {
                 const isActive =
                   pathname === link.href ||
@@ -218,22 +259,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Main Content */}
-      <div className='flex-1 overflow-auto'>
+      <div className='flex-1 flex flex-col overflow-hidden'>
         {/* Top header */}
-        <header className='bg-white shadow-sm h-16 flex items-center px-6 sticky top-0 z-10'>
+        <header className='bg-white shadow-sm border-b h-16 flex items-center px-6 sticky top-0 z-10'>
           <h1 className='text-xl font-semibold text-gray-800'>
             {sidebarLinks.find(
               (link) =>
                 pathname === link.href || pathname?.startsWith(`${link.href}/`)
             )?.name || "Admin Dashboard"}
           </h1>
-          <div className='ml-auto'>
-            {/* You can add header actions here (notifications, profile, etc.) */}
-          </div>
         </header>
 
         {/* Page content */}
-        <main className='p-6'>{children}</main>
+        <main className='flex-1 overflow-auto bg-gray-50'>{children}</main>
 
         {/* Footer */}
         <footer className='bg-white p-4 border-t text-center text-sm text-gray-500'>
