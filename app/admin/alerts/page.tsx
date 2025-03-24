@@ -86,8 +86,8 @@ export default function AlertsPage() {
   useEffect(() => {
     if (alerts.length > 0) {
       const alertsWithMedia = alerts.filter(
-        (a) => 
-          (a.mediaUrls && a.mediaUrls.length > 0) || 
+        (a) =>
+          (a.mediaUrls && a.mediaUrls.length > 0) ||
           (a.hasMedia === true && a.mediaCount && a.mediaCount > 0)
       );
       console.log("Alerts with media:", alertsWithMedia);
@@ -126,13 +126,17 @@ export default function AlertsPage() {
             const fetchedAlerts: DashboardAlert[] = snapshot.docs.map((doc) => {
               const data = doc.data();
               console.log("Alert data fetched:", doc.id, data); // Debug log
-              
+
               // Ensure mediaUrls is always an array
-              const mediaUrls = Array.isArray(data.mediaUrls) ? data.mediaUrls : [];
-              
+              const mediaUrls = Array.isArray(data.mediaUrls)
+                ? data.mediaUrls
+                : [];
+
               // Determine if the alert has media
-              const hasMedia = (mediaUrls.length > 0) || (data.hasMedia === true && data.mediaCount > 0);
-              
+              const hasMedia =
+                mediaUrls.length > 0 ||
+                (data.hasMedia === true && data.mediaCount > 0);
+
               return {
                 id: doc.id,
                 senderId: data.senderId || "",
@@ -300,7 +304,9 @@ export default function AlertsPage() {
 
   // Get severity badge based on alert type
   function getSeverityBadge(alert: DashboardAlert) {
-    const hasMedia = alert.hasMedia === true || (alert.mediaUrls && alert.mediaUrls.length > 0);
+    const hasMedia =
+      alert.hasMedia === true ||
+      (alert.mediaUrls && alert.mediaUrls.length > 0);
 
     if (alert.type === AlertType.ChatEmergency) {
       return (
@@ -371,7 +377,11 @@ export default function AlertsPage() {
         // Sort by severity (Chat Emergency > Has Media > Standard)
         const getWeight = (alert: DashboardAlert) => {
           if (alert.type === AlertType.ChatEmergency) return 3;
-          if (alert.hasMedia === true || (alert.mediaUrls && alert.mediaUrls.length > 0)) return 2;
+          if (
+            alert.hasMedia === true ||
+            (alert.mediaUrls && alert.mediaUrls.length > 0)
+          )
+            return 2;
           return 1;
         };
         return getWeight(b) - getWeight(a);
@@ -519,7 +529,9 @@ export default function AlertsPage() {
               const locationLink = getLocationLink(alert);
               const isHandled =
                 alert.status === "handled" || alert.isHandled === true;
-              const hasMedia = alert.hasMedia === true || (alert.mediaUrls && alert.mediaUrls.length > 0);
+              const hasMedia =
+                alert.hasMedia === true ||
+                (alert.mediaUrls && alert.mediaUrls.length > 0);
               const isExpanded = expandedAlerts[alert.id] || false;
 
               // Clean alert content (remove location URL if present)
@@ -580,7 +592,10 @@ export default function AlertsPage() {
                           {hasMedia && (
                             <span className='ml-2 flex items-center text-blue-600'>
                               <ImageIcon className='h-3.5 w-3.5 mr-1' />
-                              {alert.mediaCount || alert.mediaUrls?.length || 0} media
+                              {alert.mediaCount ||
+                                alert.mediaUrls?.length ||
+                                0}{" "}
+                              media
                             </span>
                           )}
                         </div>
@@ -622,11 +637,12 @@ export default function AlertsPage() {
                     {!isExpanded && hasMedia && (
                       <div className='flex items-center mt-3 text-blue-600 hover:text-blue-800'>
                         <ImageIcon className='h-4 w-4 mr-1' />
-                        <button 
+                        <button
                           onClick={() => toggleExpand(alert.id)}
                           className='text-sm font-medium'
                         >
-                          View {alert.mediaCount || alert.mediaUrls?.length} attachments
+                          View {alert.mediaCount || alert.mediaUrls?.length}{" "}
+                          attachments
                         </button>
                       </div>
                     )}
@@ -675,9 +691,10 @@ export default function AlertsPage() {
                       <div className='mt-4'>
                         <h4 className='font-medium text-gray-700 mb-2 flex items-center'>
                           <ImageIcon className='h-4 w-4 mr-1' />
-                          Media Attachments ({alert.mediaUrls?.length || alert.mediaCount || 0})
+                          Media Attachments (
+                          {alert.mediaUrls?.length || alert.mediaCount || 0})
                         </h4>
-                        
+
                         {alert.mediaUrls && alert.mediaUrls.length > 0 ? (
                           <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
                             {alert.mediaUrls.map((url, index) => (
@@ -687,17 +704,21 @@ export default function AlertsPage() {
                                 onClick={() => window.open(url, "_blank")}
                               >
                                 {!imageErrors[url] ? (
-                                  <img
+                                  <Image
                                     src={url}
                                     alt={`Media ${index + 1}`}
-                                    className='w-full h-full object-cover hover:opacity-90 cursor-pointer transition-opacity'
+                                    className='object-cover hover:opacity-90 cursor-pointer transition-opacity'
+                                    fill
+                                    sizes='(max-width: 768px) 50vw, 33vw'
                                     onError={() => handleImageError(url)}
                                   />
                                 ) : (
                                   <div className='w-full h-full flex items-center justify-center bg-gray-100 text-gray-500'>
                                     <div className='text-center p-2'>
                                       <ImageIcon className='h-8 w-8 mx-auto mb-1 text-gray-400' />
-                                      <span className='text-xs'>Failed to load image</span>
+                                      <span className='text-xs'>
+                                        Failed to load image
+                                      </span>
                                     </div>
                                   </div>
                                 )}
@@ -708,7 +729,9 @@ export default function AlertsPage() {
                           <div className='bg-gray-50 border rounded-lg p-4 text-center text-gray-500'>
                             <ImageIcon className='h-8 w-8 mx-auto mb-2 text-gray-400' />
                             <p className='text-sm'>
-                              Media attachments are available but couldn&apos;t be loaded. This may be due to permission issues or the media has been removed.
+                              Media attachments are available but couldn&apos;t
+                              be loaded. This may be due to permission issues or
+                              the media has been removed.
                             </p>
                           </div>
                         )}
