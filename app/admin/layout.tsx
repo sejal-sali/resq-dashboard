@@ -159,12 +159,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <div className='p-4 mb-2 border-b'>
             <div className='flex justify-center'>
               <Image
-                src='/assets/images/logo/resq-color.png'
+                src='/assets/images/logo/news-resq-logo.png'
                 width={180}
                 height={60}
                 quality={100}
                 alt='ResQ Logo'
                 priority
+                style={{ filter: "brightness(0) invert(0)" }}
               />
             </div>
           </div>

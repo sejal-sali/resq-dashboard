@@ -454,10 +454,7 @@ export default function AlertsPage() {
       {/* Dashboard Header */}
       <header className='bg-white border-b shadow-sm'>
         <div className='container mx-auto px-4 py-4 flex items-center justify-between'>
-          <h1 className='text-2xl font-bold text-gray-800 flex items-center'>
-            <Bell className='h-6 w-6 mr-2 text-blue-600' />
-            Emergency Alert Dashboard
-          </h1>
+          
           <div className='flex items-center space-x-4'>
             <span className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium'>
               {filteredAlerts.length} Alerts
